@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantastico Jukebox</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1db954;
+            --dark: #191414;
+            --light: #ffffff;
+            --gray: #b3b3b3;
+            --card-bg: #282828;
+            --hover: #333333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            grid-template-rows: 60px 1fr 80px;
+            height: 100vh;
+            gap: 0;
+        }
+        
+        /* Header */
+        header {
+            grid-column: 1 / 3;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid #333;
+            z-index: 100;
+            position: sticky;
+            top: 0;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 28px;
+        }
+        
+        .search-bar {
+            flex: 0 1 400px;
+            background: #333;
+            border-radius: 20px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .search-bar:focus-within {
+            background: #444;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: var(--light);
+            width: 100%;
+            margin-left: 10px;
+            outline: none;
+            font-size: 14px;
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background-color: #000;
+            padding: 20px 0;
+            overflow-y: auto;
+            height: calc(100vh - 140px);
+        }
+        
+        .nav-section {
+            margin-bottom: 30px;
+        }
+        
+        .nav-section h3 {
+            padding: 0 20px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .nav-item {
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 15px;
+        }
+        
+        .nav-item:hover {
+            background: var(--hover);
+        }
+        
+        .nav-item.active {
+            background: var(--hover);
+            color: var(--primary);
+        }
+        
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 20px 30px;
+            overflow-y: auto;
+            background: linear-gradient(180deg, #3a1c71 0%, var(--dark) 300px);
+            height: calc(100vh - 140px);
+        }
+        
+        .welcome-section {
+            margin-bottom: 30px;
+        }
+        
+        .welcome-section h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-section p {
+            color: var(--gray);
+            max-width: 600px;
+        }
+        
+        .section-title {
+            margin: 30px 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title h2 {
+            font-size: 24px;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .card:hover {
+            background: var(--hover);
+            transform: translateY(-5px);
+        }
+        
+        .card-img {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-play {
+            position: absolute;
+            bottom: 80px;
+            right: 20px;
+            background: var(--primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .card:hover .card-play {
+            opacity: 1;
+            transform: translateY(-5px);
+        }
+        
+        .card-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .card-subtitle {
+            color: var(--gray);
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Player */
+        .player {
+            grid-column: 1 / 3;
+            background: #181818;
+            border-top: 1px solid #282828;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+        
+        .now-playing {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 0 0 30%;
+        }
+        
+        .now-playing-img {
+            width: 56px;
+            height: 56px;
+            border-radius: 4px;
+            background: linear-gradient(135deg, #3a1c71, #d76d77);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .track-info .title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .track-info .artist {
+            color: var(--gray);
+            font-size: 12px;
+        }
+        
+        .player-controls {
+            flex: 0 0 40%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .control-btn {
+            background: transparent;
+            border: none;
+            color: var(--light);
+            font-size: 16px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .control-btn:hover {
+            color: var(--primary);
+        }
+        
+        .play-btn {
+            background: var(--light);
+            color: var(--dark);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .play-btn:hover {
+            transform: scale(1.1);
+            background: var(--primary);
+        }
+        
+        .progress-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: #5e5e5e;
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .progress-bar:hover .progress {
+            background: var(--primary);
+        }
+        
+        .progress-bar:hover .progress-handle {
+            opacity: 1;
+        }
+        
+        .progress {
+            position: absolute;
+            height: 100%;
+            background: var(--gray);
+            border-radius: 2px;
+            width: 30%;
+        }
+        
+        .progress-handle {
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--light);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .player-actions {
+            flex: 0 0 30%;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .btn {
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: var(--dark);
+            font-weight: bold;
+        }
+        
+        .btn:hover {
+            color: var(--light);
+        }
+        
+        .btn-primary:hover {
+            background: #1ed760;
+            transform: scale(1.05);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            color: var(--primary);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 6px;
+            background: #333;
+            border: 1px solid #444;
+            color: var(--light);
+            font-size: 14px;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: var(--primary);
+            color: var(--dark);
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        /* Volume slider */
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: #5e5e5e;
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .volume-level {
+            position: absolute;
+            height: 100%;
+            background: var(--gray);
+            border-radius: 2px;
+            width: 70%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-music"></i>
+                <span>Fantastico Jukebox</span>
+            </div>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Cerca brani, artisti, playlist...">
+            </div>
+            <div class="user-actions">
+                <button class="btn"><i class="fas fa-crown"></i> Premium</button>
+                <button class="btn"><i class="fas fa-headphones"></i> Supporto</button>
+                <button class="btn btn-primary" id="create-mix-btn"><i class="fas fa-plus"></i> Crea Mix</button>
+                <div class="btn"><i class="fas fa-user"></i></div>
+            </div>
+        </header>
+        
+        <aside class="sidebar">
+            <div class="nav-section">
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-search"></i>
+                    <span>Cerca</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-book"></i>
+                    <span>La Tua Libreria</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Playlist</h3>
+                <div class="nav-item">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Crea Playlist</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-heart"></i>
+                    <span>Brani Piaciuti</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>Ascoltati di Recente</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Social</h3>
+                <div class="nav-item">
+                    <i class="fas fa-user-friends"></i>
+                    <span>Amici</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-trophy"></i>
+                    <span>Sfide</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-palette"></i>
+                    <span>Studio Creativo</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Condivisi con te</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <h3>I Tuoi Mix</h3>
+                <div class="nav-item">
+                    <i class="fas fa-star"></i>
+                    <span>Mix Estivo 2023</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-fire"></i>
+                    <span>Remix Party</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-headphones"></i>
+                    <span>Focus Time</span>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="welcome-section">
+                <h1>Benvenuto nel tuo Jukebox</h1>
+                <p>Carica i tuoi brani, personalizza le copertine e crea playlist uniche. Scopri nuove musiche e condividi le tue creazioni con gli amici!</p>
+            </div>
+            
+            <div class="section-title">
+                <h2>Le tue creazioni recenti</h2>
+                <button class="btn btn-primary" id="create-playlist-btn">
+                    <i class="fas fa-plus"></i> Nuova Playlist
+                </button>
+            </div>
+            <div class="cards-container">
+                <div class="card">
+                    <div class="card-img"><i class="fas fa-sun"></i></div>
+                    <div class="card-play"><i class="fas fa-play"></i></div>
+                    <div class="card-title">Mix Estivo 2023</div>
+                    <div class="card-subtitle">15 brani, 45 min</div>
+                </div>
+                <div class="card">
+                    <div class="card-img"><i class="fas fa-fire"></i></div>
+                    <div class="card-play"><i class="fas fa-play"></i></div>
+                    <div class="card-title">Remix Party</div>
+                    <div class="card-subtitle">12 brani, 38 min</div>
+                </div>
+                <div class="card">
+                    <div class="card-img"><i class="fas fa-headphones"></i></div>
+                    <div class="card-play"><i class="fas fa-play"></i></div>
+                    <div class="card-title">Focus Time</div>
+                    <div class="card-subtitle">10 brani, 32 min</div>
+                </div>
+                <div class="card">
+                    <div class="card-img"><i class="fas fa-rocket"></i></div>
+                    <div class="card-play"><i class="fas fa-play"></i></div>
+                    <div class="card-title">Nuovi Esperimenti</div>
+                    <div class="card-subtitle">8 brani, 28 min</div>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <h2>Sfide in corso</h2>
+                <button class="btn">
+                    <i class="fas fa-redo"></i> Aggiorna
+                </button>
+            </div>
+            <div class="cards-container">
+                <div class="card">
+                    <div class="card-img"><i class="fas fa-trophy"></i></div>
+                    <div class="card-play"><i class="fas fa-play"></i></div>
+                    <div class="card-title">Remix Challenge</div>
+                    <div class="card-subtitle">Partecipa entro 3 giorni</div>
+                </div>
+                <div class="card">
+                    <div class="card-img"><i class="fas fa-palette"></i></div>
+                    <div class="card-play"><i class="fas fa-play"></i></div>
+                    <div class="card-title">Design Copertina</div>
+                    <div class="card-subtitle">Vota le creazioni</div>
+                </div>
+                <div class="card">
+                    <div class="card-img"><i class="fas fa-users"></i></div>
+                    <div class="card-play"><i class="fas fa-play"></i></div>
+                    <div class="card-title">Collaborazione Globale</div>
+                    <div class="card-subtitle">Unisciti al progetto</div>
+                </div>
+                <div class="card">
+                    <div class="card-img"><i class="fas fa-compact-disc"></i></div>
+                    <div class="card-play"><i class="fas fa-play"></i></div>
+                    <div class="card-title">Vinile Vintage</div>
+                    <div class="card-subtitle">Crea il tuo vinile virtuale</div>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <h2>Artisti emergenti</h2>
+                <button class="btn">
+                    <i class="fas fa-eye"></i> Scopri di più
+                </button>
+            </div>
+            <div class="cards-container">
+                <div class="card">
+                    <div class="card-img"><i class="fas fa-guitar"></i></div>
+                    <div class="card-play"><i class="fas fa-play"></i></div>
+                    <div class="card-title">Aurora Sound</div>
+                    <div class="card-subtitle">Indie Pop • 12K ascoltatori</div>
+                </div>
+                <div class="card">
+                    <div class="card-img"><i class="fas fa-drum"></i></div>
+                    <div class="card-play"><i class="fas fa-play"></i></div>
+                    <div class="card-title">Neon Rhythm</div>
+                    <div class="card-subtitle">Electronic • 8K ascoltatori</div>
+                </div>
+                <div class="card">
+                    <div class="card-img"><i class="fas fa-microphone"></i></div>
+                    <div class="card-play"><i class="fas fa-play"></i></div>
+                    <div class="card-title">Echo Waves</div>
+                    <div class="card-subtitle">Alternative • 15K ascoltatori</div>
+                </div>
+                <div class="card">
+                    <div class="card-img"><i class="fas fa-piano-keyboard"></i></div>
+                    <div class="card-play"><i class="fas fa-play"></i></div>
+                    <div class="card-title">Urban Strings</div>
+                    <div class="card-subtitle">Classical Fusion • 5K ascoltatori</div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="player">
+            <div class="now-playing">
+                <div class="now-playing-img"><i class="fas fa-music"></i></div>
+                <div class="track-info">
+                    <div class="title">Nessun brano in riproduzione</div>
+                    <div class="artist">Seleziona un brano per iniziare</div>
+                </div>
+            </div>
+            
+            <div class="player-controls">
+                <div class="control-buttons">
+                    <button class="control-btn" id="shuffle-btn"><i class="fas fa-random"></i></button>
+                    <button class="control-btn" id="prev-btn"><i class="fas fa-step-backward"></i></button>
+                    <button class="control-btn play-btn" id="play-btn"><i class="fas fa-play"></i></button>
+                    <button class="control-btn" id="next-btn"><i class="fas fa-step-forward"></i></button>
+                    <button class="control-btn" id="repeat-btn"><i class="fas fa-redo"></i></button>
+                </div>
+                <div class="progress-container">
+                    <span id="current-time">0:00</span>
+                    <div class="progress-bar" id="progress-bar">
+                        <div class="progress" id="progress"></div>
+                        <div class="progress-handle" id="progress-handle"></div>
+                    </div>
+                    <span id="total-time">0:00</span>
+                </div>
+            </div>
+            
+            <div class="player-actions">
+                <button class="btn" id="lyrics-btn"><i class="fas fa-microphone"></i></button>
+                <button class="btn" id="queue-btn"><i class="fas fa-list"></i></button>
+                <button class="btn" id="device-btn"><i class="fas fa-laptop"></i></button>
+                <div class="volume-container">
+                    <button class="btn" id="volume-btn"><i class="fas fa-volume-up"></i></button>
+                    <div class="volume-slider">
+                        <div class="volume-level" id="volume-level"></div>
+                    </div>
+                </div>
+                <button class="btn" id="share-btn"><i class="fas fa-share-alt"></i></button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modal per creare una playlist -->
+    <div class="modal" id="playlist-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Crea Nuova Playlist</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="playlist-form">
+                <div class="form-group">
+                    <label for="playlist-name">Nome Playlist</label>
+                    <input type="text" id="playlist-name" class="form-control" placeholder="Inserisci un nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="playlist-desc">Descrizione</label>
+                    <textarea id="playlist-desc" class="form-control" placeholder="Descrivi la tua playlist" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="playlist-visibility">Visibilità</label>
+                    <select id="playlist-visibility" class="form-control">
+                        <option value="public">Pubblica</option>
+                        <option value="private">Privata</option>
+                        <option value="collaborative">Collaborativa</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Crea Playlist</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notifiche -->
+    <div class="notification" id="notification">
+        Playlist creata con successo!
+    </div>
+
+    <script>
+        // Elementi DOM
+        const playBtn = document.getElementById('play-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        const repeatBtn = document.getElementById('repeat-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const progress = document.getElementById('progress');
+        const currentTimeEl = document.getElementById('current-time');
+        const totalTimeEl = document.getElementById('total-time');
+        const playlistModal = document.getElementById('playlist-modal');
+        const createPlaylistBtn = document.getElementById('create-playlist-btn');
+        const createMixBtn = document.getElementById('create-mix-btn');
+        const closeModal = document.querySelector('.close-modal');
+        const playlistForm = document.getElementById('playlist-form');
+        const notification = document.getElementById('notification');
+        const cards = document.querySelectorAll('.card');
+        const navItems = document.querySelectorAll('.nav-item');
+        const volumeLevel = document.getElementById('volume-level');
+        const volumeSlider = document.querySelector('.volume-slider');
+        const volumeBtn = document.getElementById('volume-btn');
+        
+        // Stato dell'applicazione
+        let isPlaying = false;
+        let currentTrack = 0;
+        let shuffle = false;
+        let repeat = false;
+        let volume = 0.7;
+        let currentPlaylist = [];
+        
+        // Brani di esempio
+        const tracks = [
+            { title: "Summer Vibes", artist: "Aurora Sound", duration: "3:45" },
+            { title: "Neon Lights", artist: "Neon Rhythm", duration: "4:20" },
+            { title: "Echoes", artist: "Echo Waves", duration: "3:15" },
+            { title: "Urban Symphony", artist: "Urban Strings", duration: "5:10" }
+        ];
+        
+        // Inizializzazione
+        function init() {
+            // Imposta il volume iniziale
+            volumeLevel.style.width = `${volume * 100}%`;
+            
+            // Imposta la durata totale
+            totalTimeEl.textContent = tracks[0].duration;
+            
+            // Crea una playlist di esempio
+            currentPlaylist = [...tracks];
+        }
+        
+        // Riproduzione brano
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            const icon = playBtn.querySelector('i');
+            
+            if (isPlaying) {
+                icon.classList.remove('fa-play');
+                icon.classList.add('fa-pause');
+                updateNowPlaying(currentTrack);
+                simulatePlayback();
+            } else {
+                icon.classList.remove('fa-pause');
+                icon.classList.add('fa-play');
+            }
+        }
+        
+        // Aggiorna le informazioni del brano corrente
+        function updateNowPlaying(trackIndex) {
+            const track = currentPlaylist[trackIndex];
+            const nowPlaying = document.querySelector('.now-playing');
+            
+            nowPlaying.querySelector('.title').textContent = track.title;
+            nowPlaying.querySelector('.artist').textContent = track.artist;
+            totalTimeEl.textContent = track.duration;
+            currentTimeEl.textContent = '0:00';
+            progress.style.width = '0%';
+        }
+        
+        // Simula la riproduzione (progress bar)
+        function simulatePlayback() {
+            if (!isPlaying) return;
+            
+            let currentSeconds = 0;
+            const totalSeconds = timeToSeconds(totalTimeEl.textContent);
+            
+            const interval = setInterval(() => {
+                if (!isPlaying) {
+                    clearInterval(interval);
+                    return;
+                }
+                
+                currentSeconds++;
+                const progressPercent = (currentSeconds / totalSeconds) * 100;
+                progress.style.width = `${progressPercent}%`;
+                currentTimeEl.textContent = secondsToTime(currentSeconds);
+                
+                if (currentSeconds >= totalSeconds) {
+                    clearInterval(interval);
+                    playNext();
+                }
+            }, 1000);
+        }
+        
+        // Converti tempo in secondi
+        function timeToSeconds(time) {
+            const [min, sec] = time.split(':').map(Number);
+            return min * 60 + sec;
+        }
+        
+        // Converti secondi in formato tempo
+        function secondsToTime(seconds) {
+            const min = Math.floor(seconds / 60);
+            const sec = seconds % 60;
+            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+        
+        // Riproduci brano successivo
+        function playNext() {
+            currentTrack = (currentTrack + 1) % currentPlaylist.length;
+            updateNowPlaying(currentTrack);
+            if (isPlaying) simulatePlayback();
+        }
+        
+        // Riproduci brano precedente
+        function playPrev() {
+            currentTrack = (currentTrack - 1 + currentPlaylist.length) % currentPlaylist.length;
+            updateNowPlaying(currentTrack);
+            if (isPlaying) simulatePlayback();
+        }
+        
+        // Attiva/disattiva shuffle
+        function toggleShuffle() {
+            shuffle = !shuffle;
+            shuffleBtn.style.color = shuffle ? 'var(--primary)' : 'var(--light)';
+            
+            if (shuffle) {
+                // Mescola la playlist
+                currentPlaylist = [...tracks].sort(() => Math.random() - 0.5);
+            } else {
+                // Ripristina l'ordine originale
+                currentPlaylist = [...tracks];
+            }
+        }
+        
+        // Attiva/disattiva repeat
+        function toggleRepeat() {
+            repeat = !repeat;
+            repeatBtn.style.color = repeat ? 'var(--primary)' : 'var(--light)';
+        }
+        
+        // Gestisce il click sulla progress bar
+        function setProgress(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const percent = (clickX / width) * 100;
+            progress.style.width = `${percent}%`;
+            
+            // Aggiorna il tempo corrente
+            const totalSeconds = timeToSeconds(totalTimeEl.textContent);
+            const currentSeconds = Math.floor((percent / 100) * totalSeconds);
+            currentTimeEl.textContent = secondsToTime(currentSeconds);
+        }
+        
+        // Gestisce il click sul volume
+        function setVolume(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            volume = clickX / width;
+            volumeLevel.style.width = `${volume * 100}%`;
+            
+            // Aggiorna l'icona del volume
+            const icon = volumeBtn.querySelector('i');
+            if (volume === 0) {
+                icon.classList.remove('fa-volume-down', 'fa-volume-up');
+                icon.classList.add('fa-volume-mute');
+            } else if (volume < 0.5) {
+                icon.classList.remove('fa-volume-mute', 'fa-volume-up');
+                icon.classList.add('fa-volume-down');
+            } else {
+                icon.classList.remove('fa-volume-mute', 'fa-volume-down');
+                icon.classList.add('fa-volume-up');
+            }
+        }
+        
+        // Mostra il modal per creare playlist
+        function showPlaylistModal() {
+            playlistModal.style.display = 'flex';
+        }
+        
+        // Nasconde il modal
+        function hidePlaylistModal() {
+            playlistModal.style.display = 'none';
+        }
+        
+        // Mostra una notifica
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Gestisce la creazione di una playlist
+        function handlePlaylistCreation(e) {
+            e.preventDefault();
+            const name = document.getElementById('playlist-name').value;
+            const desc = document.getElementById('playlist-desc').value;
+            const visibility = document.getElementById('playlist-visibility').value;
+            
+            // Qui andrebbe la logica per salvare la playlist
+            console.log(`Playlist creata: ${name}, ${desc}, ${visibility}`);
+            
+            // Mostra notifica
+            showNotification(`Playlist "${name}" creata con successo!`);
+            
+            // Reset del form e chiudi modal
+            playlistForm.reset();
+            hidePlaylistModal();
+        }
+        
+        // Gestisce il click su una card
+        function handleCardClick() {
+            const title = this.querySelector('.card-title').textContent;
+            const subtitle = this.querySelector('.card-subtitle').textContent;
+            
+            // Aggiorna le informazioni di riproduzione
+            document.querySelector('.now-playing .title').textContent = title;
+            document.querySelector('.now-playing .artist').textContent = subtitle;
+            
+            // Se non sta riproducendo, avvia la riproduzione
+            if (!isPlaying) {
+                togglePlay();
+            }
+            
+            // Mostra un feedback
+            showNotification(`Riproduzione: ${title}`);
+        }
+        
+        // Gestisce il cambio di sezione nella sidebar
+        function handleNavClick() {
+            navItems.forEach(item => item.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Mostra un feedback
+            const sectionName = this.querySelector('span').textContent;
+            showNotification(`Sezione: ${sectionName}`);
+        }
+        
+        // Aggiungi event listeners
+        playBtn.addEventListener('click', togglePlay);
+        prevBtn.addEventListener('click', playPrev);
+        nextBtn.addEventListener('click', playNext);
+        shuffleBtn.addEventListener('click', toggleShuffle);
+        repeatBtn.addEventListener('click', toggleRepeat);
+        progressBar.addEventListener('click', setProgress);
+        volumeSlider.addEventListener('click', setVolume);
+        createPlaylistBtn.addEventListener('click', showPlaylistModal);
+        createMixBtn.addEventListener('click', () => showNotification('Modal Mix Creator in sviluppo!'));
+        closeModal.addEventListener('click', hidePlaylistModal);
+        playlistForm.addEventListener('submit', handlePlaylistCreation);
+        
+        // Chiudi modal cliccando fuori
+        window.addEventListener('click', (e) => {
+            if (e.target === playlistModal) {
+                hidePlaylistModal();
+            }
+        });
+        
+        // Aggiungi event listeners per le card
+        cards.forEach(card => {
+            card.addEventListener('click', handleCardClick);
+        });
+        
+        // Aggiungi event listeners per la navigazione
+        navItems.forEach(item => {
+            item.addEventListener('click', handleNavClick);
+        });
+        
+        // Inizializza l'app
+        init();
+    </script>
+</body>
+</html>
